@@ -1,3 +1,9 @@
+<<<<<<< HEAD
 *.pkl
 *.h5
 *.keras
+=======
+*.h5 filter=lfs diff=lfs merge=lfs -text
+*.zip filter=lfs diff=lfs merge=lfs -text
+*.pkl filter=lfs diff=lfs merge=lfs -text
+>>>>>>> 6a0dc897451c67eb41ae27c2d1e6a8ae6a7b8a22
