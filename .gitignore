@@ -1,0 +1,8 @@
+# Large model files
+*.h5
+*.keras
+*.pkl
+
+# Python cache
+__pycache__/
+*.py[cod]
