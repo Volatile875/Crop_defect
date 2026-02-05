@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Disease Prediction System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #138808 0%, #2ecc71 100%);
+            --secondary-gradient: linear-gradient(135deg, #FF9933 0%, #ffc107 100%);
+            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --danger-color: #e74c3c;
+            --success-color: #27ae60;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #e8f5e9 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+            padding-bottom: 50px;
+        }
+
+        /* Header */
+        header {
+            background: #ffffff;
+            /* Tricolor bottom border using border-image */
+            border-bottom: 6px solid transparent;
+            border-image: linear-gradient(to right, #FF9933, #ffffff, #138808) 1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-inner {
+            background: #ffffff;
+            padding: 12px 0;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            /* Left aligned by default (PC) */
+            gap: 15px;
+        }
+
+        .logo-img {
+            height: 50px;
+            width: auto;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000080;
+            /* Navy Blue (Ashoka Chakra color) for Gov feel */
+            white-space: nowrap;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hero h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            color: var(--text-light);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Card */
+        .app-card {
+            background: var(--glass-bg);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: var(--shadow-lg);
+            border: var(--glass-border);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed #cbd5e0;
+            border-radius: 16px;
+            padding: 40px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: #2ecc71;
+            background: #f0fdf4;
+            transform: translateY(-2px);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #b0bec5;
+            margin-bottom: 15px;
+            transition: color 0.3s;
+        }
+
+        .upload-area:hover .upload-icon {
+            color: #2ecc71;
+        }
+
+        .upload-area h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .upload-area p {
+            font-size: 14px;
+            color: #95a5a6;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.4);
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            box-shadow: 0 5px 15px rgba(127, 140, 141, 0.3);
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 24px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2ecc71;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Results */
+        .result-panel {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .disease-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 20px 0 10px;
+        }
+
+        .confidence-pill {
+            display: inline-block;
+            padding: 6px 16px;
+            background: #e0f2f1;
+            color: #00897b;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            text-align: left;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px;
+            border-left: 4px solid #2ecc71;
+        }
+
+        .info-card.full-width {
+            grid-column: span 2;
+        }
+
+        .info-card h4 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 6px;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .info-list li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 7px;
+            width: 6px;
+            height: 6px;
+            background: #2ecc71;
+            border-radius: 50%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-container {
+                /* Keep row direction for one-line requirement */
+                flex-direction: row;
+                gap: 10px;
+                justify-content: center;
+            }
+
+            .logo-img {
+                height: 40px;
+                /* Slightly smaller logo on mobile */
+            }
+
+            .header-title {
+                font-size: 16px;
+                /* Smaller font to fit on one line */
+                white-space: nowrap;
+                /* Prevent wrapping to keep one line */
+            }
+
+            .hero h2 {
+                font-size: 26px;
+            }
+
+            .app-card {
+                padding: 25px 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-card.full-width {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-inner">
+            <div class="header-container">
+                <img src="https://i.pinimg.com/originals/16/f6/08/16f6080f1540f1a4bac853126f87333b.png" alt="Emblem"
+                    class="logo-img">
+                <div class="header-title">Crop Disease Prediction System</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h2>AI-Powered Crop Diagnosis</h2>
+            <p>Early detection of crop diseases for better yield. Upload a photo of your crop to get started.</p>
+        </div>
+
+        <div class="app-card" id="mainCard">
+
+            <!-- Loading -->
+            <div class="loading-overlay" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing leaf patterns...</p>
+            </div>
+
+            <!-- Input Section -->
+            <div id="uploadContainer">
+                <div class="upload-area" onclick="document.getElementById('leafInput').click()">
+                    <div class="upload-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                    </div>
+                    <h3>Upload Leaf Image</h3>
+                    <p>Click to browse or drag & drop</p>
+                    <input type="file" id="leafInput" hidden accept="image/*" onchange="previewImage(event)">
+                </div>
+
+                <img id="imagePreview">
+
+                <button id="predictBtn" class="btn" onclick="predictDisease()" style="display: none;">
+                    Analyze Infection
+                </button>
+            </div>
+
+            <!-- Result Section -->
+            <div id="resultPanel" class="result-panel">
+                <h2 class="disease-title" id="diseaseName">Disease Name</h2>
+                <div class="confidence-pill" id="confidenceScore">95% Match</div>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>💊 Treatment</h4>
+                        <ul class="info-list" id="remediesList"></ul>
+                    </div>
+                    <div class="info-card">
+                        <h4>🧪 Pesticides</h4>
+                        <ul class="info-list" id="pesticidesList"></ul>
+                    </div>
+                    <div class="info-card full-width">
+                        <h4>🛡️ Prevention</h4>
+                        <ul class="info-list" id="preventionList"></ul>
+                    </div>
+                </div>
+
+                <button class="btn btn-reset" onclick="resetPrediction()">Check Another</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    document.querySelector('.upload-area').style.display = 'none';
+                    document.getElementById('predictBtn').style.display = 'inline-block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function predictDisease() {
+            const input = document.getElementById('leafInput');
+            if (!input.files[0]) return;
+
+            const loading = document.getElementById('loading');
+            loading.style.display = 'flex';
+
+            const formData = new FormData();
+            formData.append('file', input.files[0]);
+
+            try {
+                // Ensure the port matches the backend (8000)
+                const response = await fetch('http://localhost:8000/predict_image', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    showResults(data);
+                } else {
+                    alert('Prediction failed: ' + (data.error || 'Unknown error'));
+                    resetPrediction();
+                }
+            } catch (error) {
+                alert('Connection Error. Make sure the backend is running on port 8000.\nDetails: ' + error.message);
+                console.error(error);
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function showResults(data) {
+            document.getElementById('uploadContainer').style.display = 'none';
+            document.getElementById('resultPanel').style.display = 'block';
+
+            const diseaseName = data.disease;
+            document.getElementById('diseaseName').textContent = diseaseName;
+            document.getElementById('confidenceScore').textContent = `Confidence: ${(data.confidence * 100).toFixed(1)}%`;
+
+            // Visual distinction for Healthy vs Diseased
+            const diseaseTitle = document.getElementById('diseaseName');
+            const confidencePill = document.getElementById('confidenceScore');
+
+            // simple check: if "healthy" is in the name (case-insensitive)
+            if (diseaseName.toLowerCase().includes('healthy')) {
+                diseaseTitle.style.color = 'var(--success-color)';
+                confidencePill.style.backgroundColor = '#e0f2f1'; // light teal
+                confidencePill.style.color = '#00897b';
+                diseaseTitle.innerHTML = `🌿 ${diseaseName}`;
+            } else {
+                diseaseTitle.style.color = 'var(--danger-color)';
+                confidencePill.style.backgroundColor = '#ffebee'; // light red
+                confidencePill.style.color = '#c62828';
+                diseaseTitle.innerHTML = `⚠️ ${diseaseName}`;
+            }
+
+            const renderList = (id, items) => {
+                const el = document.getElementById(id);
+                el.innerHTML = items && items.length > 0
+                    ? items.map(item => `<li>${item}</li>`).join('')
+                    : '<li>No specific data available.</li>';
+            };
+
+            renderList('remediesList', data.remedies);
+            renderList('pesticidesList', data.pesticides);
+            renderList('preventionList', data.prevention);
+        }
+
+        function resetPrediction() {
+            document.getElementById('uploadContainer').style.display = 'block';
+            document.getElementById('resultPanel').style.display = 'none';
+            document.getElementById('predictBtn').style.display = 'none';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.querySelector('.upload-area').style.display = 'block';
+            document.getElementById('leafInput').value = '';
+        }
+    </script>
+</body>
+
+</html>
