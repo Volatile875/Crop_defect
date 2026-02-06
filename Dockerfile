@@ -1,62 +1,27 @@
-# -----------------------------
-# Base Image
-# -----------------------------
 FROM python:3.10-slim
 
-# -----------------------------
-# Environment Settings
-# -----------------------------
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV TF_ENABLE_ONEDNN_OPTS=0
 
-# -----------------------------
-# Working Directory
-# -----------------------------
 WORKDIR /app
 
-# -----------------------------
-# Install System Dependencies
-# -----------------------------
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# -----------------------------
-# Copy Requirements First (Docker Cache Optimization)
-# -----------------------------
 COPY requirements.txt .
 
-# -----------------------------
-# Install Python Dependencies
-# -----------------------------
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    gcc \
-    curl \
-    supervisor \
-    && rm -rf /var/lib/apt/lists/*
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# -----------------------------
-# Copy Project Files
-# -----------------------------
 COPY . .
 
-# -----------------------------
-# Expose Ports
-# -----------------------------
 EXPOSE 8501
 EXPOSE 8000
 
-# -----------------------------
-# Health Check (Optional but Professional)
-# -----------------------------
 HEALTHCHECK CMD curl --fail http://localhost:8000 || exit 1
 
-# -----------------------------
-# Run FastAPI + Streamlit Together
-# -----------------------------
-CMD ["supervisord", "-c", "supervisord.conf"]
- 
+CMD ["sh", "-c", "uvicorn api:app --host 0.0.0.0 --port 8000 & streamlit run app.py --server.port 8501 --server.address 0.0.0.0"]
